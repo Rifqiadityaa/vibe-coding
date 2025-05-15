@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Vibe Coding - A New Programming Philosophy</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/night.css">
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+		<!-- Chart.js plugin -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+		<script src="plugin/chart/plugin.js"></script>
+		<style>
+			.reveal section img { background:none; border:none; box-shadow:none; }
+			.reveal pre { background: #1c1c1c; }
+			.reveal h1 { font-size: 2.5em; }
+			.reveal .highlight { color: #7ec699; }
+			.chart-container { 
+				position: relative;
+				width: 300px;
+				height: 250px;
+				margin: 0 auto;
+			}
+			.source-link {
+				color: #7ec699;
+				text-decoration: none;
+				margin-left: 8px;
+				font-size: 1rem;
+			}
+			.source-link:hover {
+				color: #9eddb7;
+			}
+			.title-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.tool-card {
+				transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+				position: relative;
+			}
+			.other-tool {
+				opacity: 1;
+				transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+			section[data-auto-animate="running"] .other-tool {
+				opacity: 0.2;
+				filter: blur(1px);
+				transform: scale(0.95);
+			}
+			@keyframes spotlight {
+				0% {
+					box-shadow: 0 0 0 rgba(126, 198, 153, 0);
+				}
+				50% {
+					box-shadow: 0 0 30px rgba(126, 198, 153, 0.3);
+				}
+				100% {
+					box-shadow: 0 0 0 rgba(126, 198, 153, 0);
+				}
+			}
+			section[data-auto-animate="running"] [data-id="cursor-tool"] {
+				animation: spotlight 2s ease-in-out infinite;
+				background: rgba(126, 198, 153, 0.1);
+				border-radius: 16px;
+				border: 2px solid rgba(126, 198, 153, 0.3);
+				padding: 2rem;
+				z-index: 1;
+			}
+
+			/* Minimalistic Animations and Styles */
+			.pros-cons-container {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 5rem;
+				gap: 6rem;
+			}
+
+			.pros, .cons {
+				flex: 1;
+				padding: 2rem;
+				transition: all 0.5s ease;
+				position: relative;
+			}
+
+			.pro-point, .con-point {
+				margin-bottom: 2rem;
+				transition: all 0.5s ease;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.pro-point i, .con-point i {
+				font-size: 1rem;
+				width: 16px;
+				opacity: 0.8;
+			}
+
+			.pro-point span, .con-point span {
+				font-size: 1.2rem;
+				letter-spacing: 0.02em;
+			}
+
+			/* Active state */
+			.active .pro-point,
+			.active .con-point {
+				transform: scale(1.05);
+			}
+
+			.active h3 {
+				transform: scale(1.1);
+				transform-origin: left;
+			}
+
+			/* Inactive state */
+			.inactive {
+				opacity: 0.25;
+			}
+
+			.inactive .pro-point,
+			.inactive .con-point {
+				transform: scale(0.95);
+			}
+
+			/* Transitions */
+			.pros h3,
+			.cons h3 {
+				font-weight: 400;
+				transition: all 0.5s ease;
+				transform-origin: left;
+				margin-bottom: 3rem;
+			}
+
+			/* Section title */
+			.pros-cons-title {
+				font-size: 2.5rem !important;
+				margin-bottom: 2rem;
+				font-weight: 300;
+				letter-spacing: 0.05em;
+			}
+
+			/* Quote slide styles */
+			.quote-container {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				max-width: 900px;
+				margin: 0 auto;
+				text-align: center;
+				height: 100%;
+			}
+
+			.quote-text {
+				font-family: "Crimson Text", Georgia, serif;
+				font-size: 3rem;
+				font-style: italic;
+				line-height: 1.4;
+				margin-bottom: 1.5rem;
+				font-weight: 300;
+				max-width: 1000px;
+			}
+
+			.quote-author {
+				font-family: "Crimson Text", Georgia, serif;
+				font-size: 1.75rem;
+				opacity: 0.8;
+			}
+
+			.quote-points {
+				text-align: left;
+				font-size: 1.4rem;
+				font-weight: 300;
+				line-height: 1.6;
+				margin-top: 2rem;
+			}
+
+			.quote-points li {
+				margin-bottom: 1.5rem;
+				opacity: 0;
+				transform: translateY(20px);
+				transition: all 0.5s ease;
+			}
+
+			section[data-auto-animate="running"] .quote-points li {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			.quote-points li:nth-child(1) { transition-delay: 0.1s; }
+			.quote-points li:nth-child(2) { transition-delay: 0.2s; }
+			.quote-points li:nth-child(3) { transition-delay: 0.3s; }
+			.quote-points li:nth-child(4) { transition-delay: 0.4s; }
+
+			/* Quote transition */
+			.quote-slide {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+			}
+
+			.quote-content {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				opacity: 1;
+				transition: all 0.5s ease;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1 style="font-size: 5rem;">Vibe Coding</h1>
+					<h3 style="font-size: 2rem;">Redefining the Future of Programming… or Is It? </h3>
+				</section>
+				
+				<section data-background-iframe="https://karpathy.ai/"></section>
+				<section data-background-iframe="https://karpathy.ai/" data-auto-animate data-background-opacity="0.1">
+					<div>
+						<img src="images/tweet.png" alt="Andrej Karpathy Tweet" style="width: 550px; height: 500px; object-fit: contain;">
+					</div>
+				</section>
+				<section data-background-iframe="https://karpathy.ai/" data-auto-animate data-background-opacity="0.1">
+					<div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+						<img src="images/tweet.png" alt="Andrej Karpathy Tweet"
+							style="width: 550px; height: 500px; object-fit: contain;">
+						<div>
+							<p>tl;dr</p>
+							<p style="font-size: 1.25rem;">
+								Andrej Karpathy describes a new coding style he calls "vibe coding", where he relies almost entirely on AI tools (like LLMs and voice interfaces) to build projects. He gives vague commands, accepts all suggestions blindly, doesn't read diffs or error messages, and often works around bugs. Despite the chaotic method, it usually works well enough for casual or weekend projects—highlighting how powerful and accessible AI-assisted coding has become.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				<section data-auto-animate>
+					<h1 style="font-size: 3rem; margin-bottom: 5rem;">"Vibing" Tools</h1>
+					<div style="
+						display: grid;
+						grid-template-columns: repeat(4, 1fr);
+						column-gap: 0;
+						row-gap: 2rem;
+						margin-top: 3rem;
+					">
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://cursor.sh/apple-touch-icon.png" alt="Cursor" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://cursor.sh" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Cursor</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://windsurf.com/favicon.svg" alt="Windsurf" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://windsurf.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Windsurf</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/v0.png" alt="v0" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://v0.dev" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">v0</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://replit.com/public/icons/apple-icon-180.png" alt="Replit" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://replit.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Replit</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/cline.png" alt="Cline" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://cline.bot/" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Cline</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://www.tabnine.com/favicon.ico" alt="Tabnine" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://www.tabnine.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Tabnine</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://cdn-1.webcatalog.io/catalog/tempo-labs/tempo-labs-icon-filled-256.png?v=1716618341271" alt="Tempo" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://www.tempo.new/" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Tempo</a>
+						</div>
+
+						<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://anthropic.com/favicon.ico" alt="Claude" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://claude.ai" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Claude</a>
+						</div>
+					</div>
+				</section>
+
+				<section data-auto-animate>
+					<h1 style="font-size: 3rem; margin-bottom: 5rem;">"Vibing" Tools</h1>
+					<div style="
+						display: grid;
+						grid-template-columns: repeat(4, 1fr);
+						column-gap: 0;
+						row-gap: 2rem;
+						margin-top: 3rem;
+					">
+						<div class="tool-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;" data-id="cursor-tool">
+							<img src="https://cursor.sh/apple-touch-icon.png" alt="Cursor" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://cursor.sh" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Cursor</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://windsurf.com/favicon.svg" alt="Windsurf" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://windsurf.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Windsurf</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/v0.png" alt="v0" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://v0.dev" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">v0</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://replit.com/public/icons/apple-icon-180.png" alt="Replit" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://replit.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Replit</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/cline.png" alt="Cline" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://cline.bot/" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Cline</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://www.tabnine.com/favicon.ico" alt="Tabnine" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://www.tabnine.com" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Tabnine</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://cdn-1.webcatalog.io/catalog/tempo-labs/tempo-labs-icon-filled-256.png?v=1716618341271" alt="Tempo" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://www.tempo.new/" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Tempo</a>
+						</div>
+
+						<div class="tool-card other-tool" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 0.75rem;">
+							<img src="https://anthropic.com/favicon.ico" alt="Claude" style="width: 50px; height: 50px; border-radius: 8px; margin-bottom: 0.5rem;">
+							<a href="https://claude.ai" target="_blank" class="source-link" style="font-size: 1rem; margin-left: 0;">Claude</a>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h5 style="margin-bottom: 5rem;">The Rise of AI-Generated Code</h2>
+					<div style="display: flex; justify-content: space-between; align-items: center;">
+						<div>
+							<div class="title-container">
+								<h6 style="font-size: 1.5rem; text-align: center; white-space: pre-line;">Y Combinator's
+									Winter 2025 batch</h6>
+								<a href="https://techcrunch.com/2025/03/06/a-quarter-of-startups-in-ycs-current-cohort-have-codebases-that-are-almost-entirely-ai-generated/" target="_blank" class="source-link" title="Y Combinator Source">
+									<i class="fa-solid fa-external-link" style="font-size: 0.75rem;"></i>
+								</a>
+							</div>
+							<div class="chart-container">
+								<canvas data-chart="pie">
+									<!--
+									{
+										"data": {
+											"labels": [">95% AI-Generated", "<95% AI-Generated"],
+											"datasets": [{
+												"data": [25, 75],
+												"backgroundColor": ["#7ec699", "#2f3136"]
+											}]
+										},
+										"options": {
+											"responsive": true,
+											"plugins": {
+												"legend": {
+													"position": "bottom",
+													"labels": {
+														"color": "#fff",
+														"font": {
+															"size": 12
+														}
+													}
+												},
+												"title": {
+													"display": true,
+													"text": "YC W25 Startups (%)",
+													"color": "#fff",
+													"font": {
+														"size": 12
+													}
+												}
+											}
+										}
+									}
+									-->
+								</canvas>
+							</div>
+						</div>
+						<div>
+							<div class="title-container">
+								<h6 style="font-size: 1.5rem; text-align: center; white-space: pre-line;">GitHub Copilot
+									Performance Impact</h6>
+								<a href="https://arxiv.org/abs/2302.06590" target="_blank" class="source-link" title="GitHub Copilot Research">
+									<i class="fa-solid fa-external-link" style="font-size: 0.75rem;"></i>
+								</a>
+							</div>
+							<div class="chart-container">
+								<canvas data-chart="bar">
+									<!--
+									{
+										"data": {
+											"labels": ["Without Copilot", "With Copilot"],
+											"datasets": [{
+												"data": [100, 44.2],
+												"backgroundColor": ["#2f3136", "#7ec699"],
+												"label": "Development Time"
+											}]
+										},
+										"options": {
+											"responsive": true,
+											"indexAxis": "y",
+											"plugins": {
+												"legend": {
+													"display": false
+												},
+												"title": {
+													"display": true,
+													"text": "Development Time Comparison (Baseline: 100%)",
+													"color": "#fff",
+													"font": {
+														"size": 12
+													}
+												}
+											},
+											"scales": {
+												"x": {
+													"grid": {
+														"color": "rgba(255, 255, 255, 0.1)"
+													},
+													"ticks": {
+														"color": "#fff"
+													}
+												},
+												"y": {
+													"grid": {
+														"display": false
+													},
+													"ticks": {
+														"color": "#fff"
+													}
+												}
+											}
+										}
+									}
+									-->
+								</canvas>
+							</div>
+						</div>
+						<div>
+							<div class="title-container">
+								<h6 style="font-size: 1.5rem; text-align: center; white-space: pre-line;">Google's
+									Code Generation</h6>
+								<a href="https://www.businessinsider.com/google-earnings-q3-2024-new-code-created-by-ai-2024-10" target="_blank" class="source-link" title="Google Cloud Blog">
+									<i class="fa-solid fa-external-link" style="font-size: 0.75rem;"></i>
+								</a>
+							</div>
+							<div class="chart-container">
+								<canvas data-chart="bar">
+									<!--
+									{
+										"data": {
+											"labels": ["Current Codebase"],
+											"datasets": [
+												{
+													"label": "AI-Generated",
+													"data": [25],
+													"backgroundColor": "#7ec699"
+												},
+												{
+													"label": "Traditional",
+													"data": [75],
+													"backgroundColor": "#2f3136"
+												}
+											]
+										},
+										"options": {
+											"responsive": true,
+											"plugins": {
+												"legend": {
+													"position": "bottom",
+													"labels": {
+														"color": "#fff",
+														"font": {
+															"size": 12
+														}
+													}
+												},
+												"title": {
+													"display": true,
+													"text": "New Code Distribution at Google (%)",
+													"color": "#fff",
+													"font": {
+														"size": 12
+													}
+												}
+											},
+											"scales": {
+												"x": {
+													"stacked": true,
+													"grid": {
+														"display": false
+													},
+													"ticks": {
+														"color": "#fff"
+													}
+												},
+												"y": {
+													"stacked": true,
+													"grid": {
+														"color": "rgba(255, 255, 255, 0.1)"
+													},
+													"ticks": {
+														"color": "#fff"
+													}
+												}
+											}
+										}
+									}
+									-->
+								</canvas>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section data-auto-animate>
+					<div class="pros-cons-container">
+						<div class="pros active">
+							<h3 style="color: #7ec699;">Pros</h3>
+							<ul style="list-style: none; padding: 0;">
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Rapid prototyping & iteration</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Reduced cognitive load</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Natural language interface</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Lower barrier to entry</span>
+								</li>
+							</ul>
+						</div>
+						<div class="cons inactive">
+							<h3 style="color: #e67e7e;">Cons</h3>
+							<ul style="list-style: none; padding: 0;">
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Less control over implementation</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Potential security risks</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Dependency on AI services</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Technical debt accumulation</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<section data-auto-animate>
+					<div class="pros-cons-container">
+						<div class="pros inactive">
+							<h3 style="color: #7ec699;">Pros</h3>
+							<ul style="list-style: none; padding: 0;">
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Rapid prototyping & iteration</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Reduced cognitive load</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Natural language interface</span>
+								</li>
+								<li class="pro-point">
+									<i class="fa-solid fa-check"></i>
+									<span>Lower barrier to entry</span>
+								</li>
+							</ul>
+						</div>
+						<div class="cons active">
+							<h3 style="color: #e67e7e;">Cons</h3>
+							<ul style="list-style: none; padding: 0;">
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Less control over implementation</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Potential security risks</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Dependency on AI services</span>
+								</li>
+								<li class="con-point">
+									<i class="fa-solid fa-xmark"></i>
+									<span>Technical debt accumulation</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<section data-auto-animate class="quote-slide">
+					<div class="quote-content">
+						<blockquote class="quote-text">
+							"The greatest enemy of knowledge is not ignorance, it is the illusion of knowledge."
+						</blockquote>
+						<p class="quote-author">— Stephen Hawking</p>
+					</div>
+				</section>
+
+				<section data-auto-animate class="quote-slide">
+					<div class="quote-container">
+						<ul class="quote-points">
+							<li>In vibe coding, AI can make us feel like we understand things we don't.</li>
+							<li>Working code ≠ understood code.</li>
+							<li>False confidence is more dangerous than honest ignorance.</li>
+							<li>Always question, test, and learn — even when AI helps.</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					<h1>Thank You</h1>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/chart/plugin.js"></script>
+		<script>
+			Reveal.initialize({
+				hash: true,
+				slideNumber: true,
+				transition: 'slide',
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealChart ]
+			});
+		</script>
+	</body>
+</html>
